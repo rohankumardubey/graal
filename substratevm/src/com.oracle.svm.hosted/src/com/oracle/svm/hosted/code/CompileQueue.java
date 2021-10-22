@@ -423,7 +423,7 @@ public class CompileQueue {
              * but are no longer reachable now.
              */
             for (HostedMethod method : universe.getMethods()) {
-// method.wrapped.setAnalyzedGraph(null);
+                method.wrapped.setAnalyzedGraph(null);
             }
 
             try (ProgressReporter.ReporterClosable ac = reporter.printInlining()) {
