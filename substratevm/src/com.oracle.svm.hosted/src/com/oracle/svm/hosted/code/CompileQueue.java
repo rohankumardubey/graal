@@ -415,9 +415,10 @@ public class CompileQueue {
             try (ProgressReporter.ReporterClosable ac = reporter.printParsing()) {
                 parseAll();
             }
+            // todo re-enable
             // Checking annotations does not take long enough to justify a timer.
-            UninterruptibleAnnotationChecker.checkBeforeCompilation(universe.getMethods());
-            RestrictHeapAccessAnnotationChecker.check(debug, universe, universe.getMethods());
+            //UninterruptibleAnnotationChecker.checkBeforeCompilation(universe.getMethods());
+            //RestrictHeapAccessAnnotationChecker.check(debug, universe, universe.getMethods());
 
             /*
              * The graph in the analysis universe is no longer necessary. This clears the graph for
