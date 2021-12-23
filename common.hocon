@@ -1,4 +1,4 @@
-specVersion = "2"
+specVersion = "3"
 
 include "common.json"
 include "graal-common.json"

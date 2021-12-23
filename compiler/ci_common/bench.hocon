@@ -16,8 +16,8 @@ bench-common : ${compilerCommon} {
     "image": "phx.ocir.io/oraclelabs2/c_graal/buildslave:buildslave_ol8",
     "mount_modules": true
   }
+  python_version : "3",  
   environment: {
-    MX_PYTHON_VERSION : "3",
     BASE_BENCH_RESULTS_FILE_NAME: "bench-results.json",
     BENCH_RESULTS_FILE_PATH : "bench-results.json"
   }

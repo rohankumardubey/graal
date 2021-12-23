@@ -22,8 +22,8 @@
   // ****************************
   compiler_bench_base:: bench_common.bench_base + {
     job_prefix:: "bench-compiler",
+    python_version : "3",
     environment+: {
-      MX_PYTHON_VERSION : "3",
       BENCH_RESULTS_FILE_PATH : "bench-results.json"
     },
     plain_benchmark_cmd:: ["mx", "--kill-with-sigquit", "benchmark", "--fork-count-file=${FORK_COUNT_FILE}", "--extras=${BENCH_SERVER_EXTRAS}", "--results-file", "${BENCH_RESULTS_FILE_PATH}", "--machine-name=${MACHINE_NAME}", "--tracker=rss"],
