@@ -411,7 +411,7 @@ suite = {
             "dependencies": [
                 "com.oracle.graal.pointsto",
             ],
-            "checkstyle": "com.oracle.graal.pointsto",
+            "checkstyle": "com.oracle.svm.core",
             "javaCompliance": "11+",
             "annotationProcessors": [
                 "compiler:GRAAL_PROCESSOR",
