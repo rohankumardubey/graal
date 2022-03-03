@@ -41,7 +41,6 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ForkJoinPool;
-import java.util.stream.Collectors;
 
 import com.oracle.svm.hosted.phases.StrengthenStampsPhase;
 import org.graalvm.collections.EconomicMap;
@@ -413,8 +412,9 @@ public class CompileQueue {
             }
 
             if (!NativeImageOptions.UseExperimentalReachabilityAnalysis.getValue()) {
-                // Reachability Analysis has much denser call graphs compared to the Points-to
-                // Analysis, therefore these annotations would have to be added on a lot of new
+                // Reachability Analysis creates call graph with more edges compared to the
+                // Points-to
+                // Analysis, therefore the annotations would have to be added on a lot of new
                 // methods if these checks are supposed to pass.
                 UninterruptibleAnnotationChecker.checkBeforeCompilation(universe.getMethods());
                 RestrictHeapAccessAnnotationChecker.check(debug, universe, universe.getMethods());
@@ -1070,7 +1070,6 @@ public class CompileQueue {
                             method.format("%H.%n(%p)") +
                             ". Make sure you have used Graal annotation processors on the parent-project of the method's declaring class.");
         }
-
 
         HostedProviders providers = (HostedProviders) config.lookupBackend(method).getProviders();
         boolean needParsing = false;
