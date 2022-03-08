@@ -1,5 +1,5 @@
 local vm = import '../ci_includes/vm.jsonnet';
-local vm_common = import '../ci_common/common.jsonnet';
+local vm_common = import 'common.jsonnet';
 
 {
   vm_bench_common: {
