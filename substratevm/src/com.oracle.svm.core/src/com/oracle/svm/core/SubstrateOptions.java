@@ -166,7 +166,7 @@ public class SubstrateOptions {
     }
 
     @Option(help = "Control native-image code optimizations: b - optimize for shortest build time, 0 - no optimizations, 1 - basic optimizations, 2 - aggressive optimizations.", type = OptionType.User)//
-    public static final HostedOptionKey<String> Optimize = new HostedOptionKey<>("2") {
+    public static final HostedOptionKey<String> Optimize = new HostedOptionKey<>("b") {
         @Override
         protected void onValueUpdate(EconomicMap<OptionKey<?>, Object> values, String oldValue, String newValue) {
             OptimizationLevel newLevel = parseOptimizationLevel(newValue);
