@@ -717,7 +717,7 @@ public class NativeImageGenerator {
             }
 
             if (methodSummaryStorage != null) {
-                methodSummaryStorage.persistData();
+                methodSummaryStorage.persistData(ImageSingletons.lookup(MethodSummaryHandler.class).collectAllInvalidated());
             }
         }
     }
@@ -725,6 +725,8 @@ public class NativeImageGenerator {
     @SuppressWarnings("try")
     private boolean runPointsToAnalysis(String imageName, OptionValues options, DebugContext debug) {
         try (Indent ignored = debug.logAndIndent("run analysis")) {
+            methodSummaryStorage.loadData();
+
             try (Indent ignored1 = debug.logAndIndent("process analysis initializers")) {
                 BeforeAnalysisAccessImpl config = new BeforeAnalysisAccessImpl(featureHandler, loader, bb, nativeLibraries, debug);
                 featureHandler.forEachFeature(feature -> feature.beforeAnalysis(config));
@@ -1092,8 +1094,8 @@ public class NativeImageGenerator {
             SimpleInMemoryMethodSummaryProvider simpleInMemoryMethodSummaryProvider = ((SimpleInMemoryMethodSummaryProvider) HostedConfiguration.instance().createMethodSummaryProvider(aUniverse,
                             aMetaAccess));
             methodSummaryStorage = new MethodSummaryStorage(new ResolutionStrategyImpl(loader, aMetaAccess), simpleInMemoryMethodSummaryProvider, options);
-            methodSummaryStorage.loadData();
             ImageSingletons.add(MethodSummaryProvider.class, simpleInMemoryMethodSummaryProvider);
+            ImageSingletons.add(MethodSummaryHandler.class, new MethodSummaryHandler());
             return new NativeImageReachabilityAnalysis(options, aUniverse, aProviders, annotationSubstitutionProcessor, analysisExecutor, heartbeatCallback,
                             methodSummaryStorage, ImageSingletons.lookup(TimerCollection.class));
         }

@@ -24,6 +24,8 @@
  */
 package com.oracle.svm.hosted.phases;
 
+import com.oracle.svm.hosted.MethodSummaryHandler;
+import jdk.vm.ci.meta.ResolvedJavaMethod;
 import org.graalvm.compiler.nodes.ConstantNode;
 import org.graalvm.compiler.nodes.ValueNode;
 import org.graalvm.compiler.nodes.graphbuilderconf.GraphBuilderContext;
@@ -34,6 +36,10 @@ import com.oracle.svm.hosted.classinitialization.ClassInitializationSupport;
 
 import jdk.vm.ci.meta.JavaConstant;
 import jdk.vm.ci.meta.ResolvedJavaField;
+import org.graalvm.nativeimage.ImageSingletons;
+
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public final class ConstantFoldLoadFieldPlugin implements NodePlugin {
 
@@ -41,6 +47,7 @@ public final class ConstantFoldLoadFieldPlugin implements NodePlugin {
 
     public ConstantFoldLoadFieldPlugin(ClassInitializationSupport classInitializationSupport) {
         this.classInitializationSupport = classInitializationSupport;
+        ImageSingletons.lookup(MethodSummaryHandler.class).addInvalidator(() -> influencedByConstantFolding);
     }
 
     @Override
@@ -64,13 +71,22 @@ public final class ConstantFoldLoadFieldPlugin implements NodePlugin {
             assert result.asJavaConstant() != null;
             JavaConstant value = result.asJavaConstant();
             assert !classInitializationSupport.shouldInitializeAtRuntime(field.getDeclaringClass()) ||
-                            value.isDefaultForKind() : "Fields in classes that are marked for initialization at run time must not be constant folded, unless they are not written in the static initializer, i.e., have the default value: " +
-                                            field.format("%H.%n");
+                    value.isDefaultForKind()
+                    : "Fields in classes that are marked for initialization at run time must not be constant folded, unless they are not written in the static initializer, i.e., have the default value: " +
+                    field.format("%H.%n");
 
             result = b.getGraph().unique(result);
             b.push(field.getJavaKind(), result);
+
+            markConstantFolding(result, b.getMethod());
             return true;
         }
         return false;
+    }
+
+    private final Set<ResolvedJavaMethod> influencedByConstantFolding = ConcurrentHashMap.newKeySet();
+
+    private void markConstantFolding(ConstantNode result, ResolvedJavaMethod method) {
+        influencedByConstantFolding.add(method);
     }
 }
