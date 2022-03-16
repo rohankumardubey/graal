@@ -110,7 +110,7 @@ public abstract class ClassRegistry {
         public final StaticObject classData;
         public final boolean isHidden;
         public final boolean isStrongHidden;
-        public int klassID = -1;
+        public long klassID = -1;
 
         public boolean addedToRegistry() {
             return !isAnonymousClass() && !isHidden();
@@ -136,7 +136,7 @@ public abstract class ClassRegistry {
             return flags;
         }
 
-        public void initKlassID(int futureKlassID) {
+        public void initKlassID(long futureKlassID) {
             this.klassID = futureKlassID;
         }
     }
@@ -206,7 +206,7 @@ public abstract class ClassRegistry {
         }
     }
 
-    private final int loaderID;
+    private final long loaderID;
 
     private ModuleEntry unnamed;
     private final PackageTable packages;
@@ -216,7 +216,7 @@ public abstract class ClassRegistry {
         return unnamed;
     }
 
-    public final int getLoaderID() {
+    public final long getLoaderID() {
         return loaderID;
     }
 
@@ -244,7 +244,7 @@ public abstract class ClassRegistry {
      */
     private volatile Collection<Klass> strongHiddenKlasses = null;
 
-    protected ClassRegistry(int loaderID) {
+    protected ClassRegistry(long loaderID) {
         this.loaderID = loaderID;
         ReadWriteLock rwLock = new ReentrantReadWriteLock();
         this.packages = new PackageTable(rwLock);
