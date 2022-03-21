@@ -46,7 +46,7 @@ import com.oracle.svm.hosted.classinitialization.ClassInitializationOptions;
 
 public class NativeImageOptions {
 
-    public static final int DEFAULT_MAX_ANALYSIS_SCALING = 16;
+    public static final int DEFAULT_MAX_ANALYSIS_SCALING = 64;
 
     @Option(help = "Comma separated list of CPU features that will be enabled while building the " +
                     "target executable, irrespective of whether they are supported by the hosted " +
