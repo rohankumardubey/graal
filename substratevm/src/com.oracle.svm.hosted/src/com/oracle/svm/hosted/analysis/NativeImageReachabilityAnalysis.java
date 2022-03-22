@@ -44,7 +44,7 @@ public class NativeImageReachabilityAnalysis extends ReachabilityAnalysis implem
     private final AnnotationSubstitutionProcessor annotationSubstitutionProcessor;
     private final DynamicHubInitializer dynamicHubInitializer;
     private final boolean strengthenGraalGraphs;
-    private final UnknownFieldHandler unknownFieldHandler;
+    private final CustomTypeFieldHandler unknownFieldHandler;
 
     public NativeImageReachabilityAnalysis(OptionValues options, AnalysisUniverse universe, HostedProviders providers, AnnotationSubstitutionProcessor annotationSubstitutionProcessor,
                     ForkJoinPool executor,
@@ -53,9 +53,9 @@ public class NativeImageReachabilityAnalysis extends ReachabilityAnalysis implem
         this.annotationSubstitutionProcessor = annotationSubstitutionProcessor;
         this.strengthenGraalGraphs = SubstrateOptions.parseOnce();
         this.dynamicHubInitializer = new DynamicHubInitializer(this);
-        this.unknownFieldHandler = new UnknownFieldHandler(this, metaAccess) {
+        this.unknownFieldHandler = new CustomTypeFieldHandler(this, metaAccess) {
             @Override
-            protected void handleUnknownObjectField(AnalysisField aField, AnalysisType... declaredTypes) {
+            protected void injectFieldTypes(AnalysisField aField, AnalysisType... declaredTypes) {
                 markFieldAccessed(aField);
                 for (AnalysisType declaredType : declaredTypes) {
                     markTypeReachable(declaredType);
@@ -76,7 +76,7 @@ public class NativeImageReachabilityAnalysis extends ReachabilityAnalysis implem
 
     @Override
     public void onFieldAccessed(AnalysisField field) {
-        unknownFieldHandler.handleUnknownValueField(field);
+        unknownFieldHandler.handleField(field);
     }
 
     @Override
