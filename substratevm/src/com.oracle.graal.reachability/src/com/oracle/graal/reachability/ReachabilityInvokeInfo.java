@@ -25,11 +25,14 @@
 package com.oracle.graal.reachability;
 
 import com.oracle.graal.pointsto.meta.AnalysisMethod;
+import com.oracle.graal.pointsto.meta.AnalysisType;
 import com.oracle.graal.pointsto.meta.InvokeInfo;
 import jdk.vm.ci.code.BytecodePosition;
+import org.graalvm.compiler.debug.GraalError;
 
 import java.util.Collection;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ReachabilityInvokeInfo implements InvokeInfo {
@@ -37,11 +40,15 @@ public class ReachabilityInvokeInfo implements InvokeInfo {
     private final ReachabilityAnalysisMethod targetMethod;
     private final BytecodePosition position;
     private final boolean isDirectInvoke;
+    private final Set<AnalysisType> instantiatedSubtypes;
+    private volatile Set<AnalysisMethod> cachedCallees;
+    private int cnt = -1;
 
     public ReachabilityInvokeInfo(ReachabilityAnalysisMethod targetMethod, BytecodePosition position, boolean isDirectInvoke) {
         this.targetMethod = targetMethod;
         this.position = position;
         this.isDirectInvoke = isDirectInvoke;
+        this.instantiatedSubtypes = targetMethod.getDeclaringClass().getInstantiatedSubtypes();
     }
 
     @Override
@@ -56,12 +63,17 @@ public class ReachabilityInvokeInfo implements InvokeInfo {
 
     @Override
     public Collection<AnalysisMethod> getCallees() {
-        return targetMethod.getDeclaringClass()
-                        .getInstantiatedSubtypes()
-                        .stream()
-                        .map(type -> type.resolveConcreteMethod(targetMethod))
-                        .filter(Objects::nonNull)
-                        .collect(Collectors.toSet());
+        if (cnt != instantiatedSubtypes.size()) {
+            // todo verify atomicity violations check then act
+            GraalError.guarantee(cnt < instantiatedSubtypes.size(), cnt + " " + instantiatedSubtypes.size() + " " + this);
+            cnt = instantiatedSubtypes.size();
+            cachedCallees = instantiatedSubtypes
+                    .stream()
+                    .map(type -> type.resolveConcreteMethod(targetMethod))
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toSet());
+        }
+        return cachedCallees;
     }
 
     @Override
